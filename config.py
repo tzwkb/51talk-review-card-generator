@@ -3,6 +3,16 @@
 # ============================================================
 
 import os
+from pathlib import Path
+
+# Load local .env if present (gitignored)
+_env_path = Path(__file__).resolve().parent / ".env"
+if _env_path.exists():
+    for line in _env_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if line and not line.startswith("#") and "=" in line:
+            k, v = line.split("=", 1)
+            os.environ.setdefault(k.strip(), v.strip())
 
 # --- AI API (OpenAI-compatible) ---
 API_KEY    = os.environ.get("REPORT_API_KEY", "")

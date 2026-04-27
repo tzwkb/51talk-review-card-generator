@@ -575,7 +575,17 @@ async def process_excel_cell(
 
     await tprint(f"  [AI]  Extracting {lesson_code}...")
     try:
-        ai_data = await extract_json_from_markdown(markdown_text)
+        prompt = SYSTEM_PROMPT
+        md = markdown_text
+        if level in {"1", "2", "3"}:
+            md = (
+                "IMPORTANT: This lesson is for beginner learners (Level " + level + "). "
+                "Output ALL section content in BOTH English and Arabic. "
+                "English text first, Arabic translation on a new line using <br>. "
+                "Do not skip the Arabic text.\n\n"
+                + markdown_text
+            )
+        ai_data = await extract_json_from_markdown(md, prompt)
     except Exception as exc:
         await tprint(f"  [ERROR] AI extraction failed for {lesson_code}: {exc}")
         return {"lesson_code": lesson_code, "html": "", "pdf": "", "png": "", "json": "", "issues": [f"ai_error:{exc}"]}

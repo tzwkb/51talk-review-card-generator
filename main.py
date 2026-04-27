@@ -72,6 +72,34 @@ def _print_result_table(reports: list[dict[str, Any]]) -> None:
         print(f"  {r['lesson_code']:<18} {status}")
 
 
+def _detect_schema(ws):
+    first_row = list(ws.iter_rows(min_row=1, max_row=1, values_only=True))
+    if not first_row:
+        return None
+    headers = [str(h).strip().lower() if h else "" for h in first_row[0]]
+    for i, h in enumerate(headers):
+        if "tb script" in h:
+            return {"type": "tracking", "markdown_col": i}
+    return {"type": "legacy", "unit_col": 0, "lesson_col": 1, "markdown_col": 4}
+
+
+def _extract_tracking_meta(row, schema, row_idx):
+    col = schema["markdown_col"]
+    if col >= len(row):
+        return None
+    text = row[col]
+    if not text or not str(text).strip():
+        return None
+    text_str = str(text).strip()
+    m = re.search(r"(?i)^\s*lesson\s*(\d+)[\s:]", text_str)
+    if not m:
+        m = re.search(r"(?i)lesson\s*(\d+)", text_str)
+    lesson = m.group(1) if m else str(row_idx)
+    m = re.search(r"(?i)unit\s*(\d+)", text_str)
+    unit = m.group(1) if m else "1"
+    return {"markdown": text_str, "unit": unit, "lesson": lesson}
+
+
 def _mode_single_file() -> None:
     print(f"\n{SEP}")
     print("  MODE: Single File")
@@ -215,37 +243,53 @@ def _mode_excel() -> None:
     tasks: list[dict[str, Any]] = []
     for sheet_name in selected_names:
         ws = wb[sheet_name]
-        m = LESSON_SHEET_RE.match(sheet_name)
-        level = m.group(1) if m else sheet_name
+        schema = _detect_schema(ws)
+        if not schema:
+            continue
+
+        if schema["type"] == "tracking":
+            m = re.search(r"(?i)level\s*(\d+)", str(excel_path.name))
+            level = m.group(1) if m else "?"
+        else:
+            m = LESSON_SHEET_RE.match(sheet_name)
+            level = m.group(1) if m else sheet_name
 
         print(f"  ── Sheet: {sheet_name}  (Level {level}) reading rows...")
         row_count = 0
         skipped_count = 0
-        for row in ws.iter_rows(min_row=2, values_only=True):
-            try:
-                markdown_text = row[MD_COL - 1]
-            except IndexError:
-                continue
-            if not markdown_text or not str(markdown_text).strip():
-                continue
-            markdown_text = str(markdown_text).strip()
+        for row_idx, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=1):
+            if schema["type"] == "tracking":
+                meta = _extract_tracking_meta(row, schema, row_idx)
+                if not meta:
+                    continue
+                markdown_text = meta["markdown"]
+                unit = meta["unit"]
+                lesson = meta["lesson"]
+            else:
+                try:
+                    markdown_text = row[schema["markdown_col"]]
+                except IndexError:
+                    continue
+                if not markdown_text or not str(markdown_text).strip():
+                    continue
+                markdown_text = str(markdown_text).strip()
 
-            try:
-                raw_unit = row[UNIT_COL - 1]
-                unit = str(int(raw_unit)) if raw_unit is not None else "?"
-            except (TypeError, ValueError):
-                unit = str(raw_unit).strip() if raw_unit else "?"
+                try:
+                    raw_unit = row[schema["unit_col"]]
+                    unit = str(int(raw_unit)) if raw_unit is not None else "?"
+                except (TypeError, ValueError):
+                    unit = str(raw_unit).strip() if raw_unit else "?"
 
-            try:
-                raw_lesson = row[LESSON_COL - 1]
-                lesson = str(int(raw_lesson)) if raw_lesson is not None else "?"
-            except (TypeError, ValueError):
-                lesson = str(raw_lesson).strip() if raw_lesson else "?"
+                try:
+                    raw_lesson = row[schema["lesson_col"]]
+                    lesson = str(int(raw_lesson)) if raw_lesson is not None else "?"
+                except (TypeError, ValueError):
+                    lesson = str(raw_lesson).strip() if raw_lesson else "?"
 
-            if not unit or unit.lower() == "none":
-                unit = "?"
-            if not lesson or lesson.lower() == "none":
-                lesson = "?"
+                if not unit or unit.lower() == "none":
+                    unit = "?"
+                if not lesson or lesson.lower() == "none":
+                    lesson = "?"
 
             lesson_code = f"L{level}U{unit}L{lesson}"
             if skip_existing and lesson_code in existing_codes:
@@ -616,10 +660,7 @@ def cli_excel(args: Any) -> None:
     if not lesson_sheets:
         lesson_sheets = [n for n in sheet_names if n not in SKIP_SHEETS]
 
-    if level_filter:
-        selected_names = [n for n in lesson_sheets if LESSON_SHEET_RE.match(n) and LESSON_SHEET_RE.match(n).group(1) in level_filter]
-    else:
-        selected_names = lesson_sheets
+    selected_names = lesson_sheets
 
     if not selected_names:
         print("  ✗  No matching sheets to process.")
@@ -639,36 +680,55 @@ def cli_excel(args: Any) -> None:
     tasks: list[dict[str, Any]] = []
     for sheet_name in selected_names:
         ws = wb[sheet_name]
-        m = LESSON_SHEET_RE.match(sheet_name)
-        level = m.group(1) if m else sheet_name
+        schema = _detect_schema(ws)
+        if not schema:
+            continue
+
+        if schema["type"] == "tracking":
+            m = re.search(r"(?i)level\s*(\d+)", str(excel_path.name))
+            level = m.group(1) if m else "?"
+        else:
+            m = LESSON_SHEET_RE.match(sheet_name)
+            level = m.group(1) if m else sheet_name
+
+        if level_filter and level not in level_filter:
+            continue
 
         row_count = 0
         skipped_count = 0
-        for row in ws.iter_rows(min_row=2, values_only=True):
-            try:
-                markdown_text = row[MD_COL - 1]
-            except IndexError:
-                continue
-            if not markdown_text or not str(markdown_text).strip():
-                continue
-            markdown_text = str(markdown_text).strip()
+        for row_idx, row in enumerate(ws.iter_rows(min_row=2, values_only=True), start=1):
+            if schema["type"] == "tracking":
+                meta = _extract_tracking_meta(row, schema, row_idx)
+                if not meta:
+                    continue
+                markdown_text = meta["markdown"]
+                unit = meta["unit"]
+                lesson = meta["lesson"]
+            else:
+                try:
+                    markdown_text = row[schema["markdown_col"]]
+                except IndexError:
+                    continue
+                if not markdown_text or not str(markdown_text).strip():
+                    continue
+                markdown_text = str(markdown_text).strip()
 
-            try:
-                raw_unit = row[UNIT_COL - 1]
-                unit = str(int(raw_unit)) if raw_unit is not None else "?"
-            except (TypeError, ValueError):
-                unit = str(raw_unit).strip() if raw_unit else "?"
+                try:
+                    raw_unit = row[schema["unit_col"]]
+                    unit = str(int(raw_unit)) if raw_unit is not None else "?"
+                except (TypeError, ValueError):
+                    unit = str(raw_unit).strip() if raw_unit else "?"
 
-            try:
-                raw_lesson = row[LESSON_COL - 1]
-                lesson = str(int(raw_lesson)) if raw_lesson is not None else "?"
-            except (TypeError, ValueError):
-                lesson = str(raw_lesson).strip() if raw_lesson else "?"
+                try:
+                    raw_lesson = row[schema["lesson_col"]]
+                    lesson = str(int(raw_lesson)) if raw_lesson is not None else "?"
+                except (TypeError, ValueError):
+                    lesson = str(raw_lesson).strip() if raw_lesson else "?"
 
-            if not unit or unit.lower() == "none":
-                unit = "?"
-            if not lesson or lesson.lower() == "none":
-                lesson = "?"
+                if not unit or unit.lower() == "none":
+                    unit = "?"
+                if not lesson or lesson.lower() == "none":
+                    lesson = "?"
 
             lesson_code = f"L{level}U{unit}L{lesson}"
             if skip_existing and lesson_code in existing_codes:
