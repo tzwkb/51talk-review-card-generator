@@ -274,7 +274,7 @@ def build_record(
         "level":       level,
         "unit":        unit,
         "lesson":      lesson,
-        "meta_line":   " | ".join(filter(None, [course_name, f"Level {level}", f"Unit {unit}", f"Lesson {lesson}"])),
+        "meta_line":   " | ".join(filter(None, [course_name, f"Level {level} (المستوى {level})", f"Unit {unit} (الوحدة {unit})", f"Lesson {lesson} (الدرس {lesson})"])),
         "title":       (ai_data.get("title") or "").strip(),
         "goal":        (ai_data.get("goal") or "").strip(),
         "sections":    cleaned_sections,
@@ -328,7 +328,7 @@ def build_unit_record(
         "level":       level,
         "unit":        unit,
         "lesson":      "Summary",
-        "meta_line":   " | ".join(filter(None, [course_name, f"Level {level}", f"Unit {unit}", "Unit Summary"])),
+        "meta_line":   " | ".join(filter(None, [course_name, f"Level {level} (المستوى {level})", f"Unit {unit} (الوحدة {unit})", "Unit Summary (ملخص الوحدة)"])),
         "title":       title,
         "goal":        (ai_data.get("goal") or "").strip(),
         "sections":    cleaned_sections,
@@ -383,7 +383,7 @@ async def process_file(
 
     prompt = SYSTEM_PROMPT
     md = markdown_text
-    if level in {"1", "2", "3"}:
+    if level in {"0", "1", "2", "3"}:
         md = (
             "IMPORTANT: This lesson is for beginner learners (Level " + level + "). "
             "Output ALL section content in BOTH English and Arabic. "
@@ -446,7 +446,7 @@ async def process_unit(
     await tprint(f"  [AI]  Summarizing {unit_code}...")
     prompt = UNIT_SYSTEM_PROMPT
     markdown = combined_markdown
-    if level in {"1", "2", "3"}:
+    if level in {"0", "1", "2", "3"}:
         markdown = (
             "IMPORTANT: This unit is for beginner learners (Level " + level + "). "
             "Output ALL section content in BOTH English and Arabic. "
@@ -577,7 +577,7 @@ async def process_excel_cell(
     try:
         prompt = SYSTEM_PROMPT
         md = markdown_text
-        if level in {"1", "2", "3"}:
+        if level in {"0", "1", "2", "3"}:
             md = (
                 "IMPORTANT: This lesson is for beginner learners (Level " + level + "). "
                 "Output ALL section content in BOTH English and Arabic. "
