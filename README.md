@@ -19,10 +19,6 @@ English | [中文](README_ZH.md)
 
  Prepare input files and run the generation commands described in the detailed README below.
 
-## Status
-
- This repository is maintained or used according to the current README notes.
-
 ## Notes
 
  The original format, parameter, and output-directory notes are kept below.
@@ -87,7 +83,3 @@ python test_quick_render.py
 python test_real_lesson.py
 python test_real_unit_excel.py
 ```
-
-## Detailed Technical Notes
-
-This README keeps the English version of the core documentation. Code blocks, paths, commands, and file-layout examples are kept literal so they can be copied and checked against the repository.
