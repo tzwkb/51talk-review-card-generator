@@ -1,6 +1,6 @@
 # A1 Review Card Generator
 
-中文 | [English](README.md)
+[English](README.md) | 中文
 
 
 自动生成 51Talk Business English 课后复习卡（PDF + PNG + HTML）。
