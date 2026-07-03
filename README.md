@@ -1,5 +1,44 @@
 # A1 Review Card Generator
 
+<!-- bilingual-readme:start -->
+
+## 双语说明 / Bilingual Documentation
+
+> 本节提供整篇 README 的中英双语维护说明；下方保留原始详细说明、命令、路径和配置示例。
+> This section provides bilingual maintenance notes for the full README; the original detailed notes, commands, paths, and configuration examples are preserved below.
+
+### 中文
+
+**概览**：51Talk Business English 课后复习卡自动生成器，输出 PDF、PNG 和 HTML 交付件。
+
+**主要能力**：
+- 将课程内容整理为课后复习卡。
+- 支持多格式输出，便于交付和预览。
+- 适合批量课程素材生产。
+
+**使用方式**：按 README 下方的依赖和脚本说明准备输入文件并运行生成命令。
+
+**状态**：该仓库仍按当前 README 的说明维护或使用。
+
+**注意事项**：保留下方原有的格式、参数和输出目录说明。
+
+### English
+
+**Overview**: Automated review-card generator for 51Talk Business English lessons, producing PDF, PNG, and HTML deliverables.
+
+**Key capabilities**:
+- Turns lesson material into after-class review cards.
+- Supports multiple output formats for delivery and preview.
+- Fits batch production of course assets.
+
+**Usage**: Prepare input files and run the generation commands described in the detailed README below.
+
+**Status**: This repository is maintained or used according to the current README notes.
+
+**Notes**: The original format, parameter, and output-directory notes are kept below.
+
+<!-- bilingual-readme:end -->
+
 自动生成 51Talk Business English 课后复习卡（PDF + PNG + HTML）。
 
 ## 功能
