@@ -83,3 +83,25 @@ python test_quick_render.py
 python test_real_lesson.py
 python test_real_unit_excel.py
 ```
+
+## Usage Modes
+
+### Interactive Mode
+
+Interactive mode is the recommended workflow for manually entering or reviewing class data before generating review cards.
+
+### Excel CLI Mode
+
+The command-line Excel mode reads structured class or student data from spreadsheets and generates review-card output without manual UI steps.
+
+## Input and Output
+
+Inputs can be Markdown or Excel depending on the chosen workflow. Outputs are generated as review-card artifacts for classroom or delivery use.
+
+## Environment Variables
+
+Use environment variables only for configuration that should not be hard-coded. Keep secrets out of committed files.
+
+## Tests and Tech Stack
+
+The project is Python-based. Run the local test or smoke-check commands documented in the repository before using generated cards in delivery workflows.
