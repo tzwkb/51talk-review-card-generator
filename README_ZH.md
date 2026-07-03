@@ -1,7 +1,9 @@
 # A1 Review Card Generator
 
-[English](README.md) | 中文
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.x-blue.svg)](https://www.python.org/)
 
+[English](README.md) | 中文
 
 自动生成 51Talk Business English 课后复习卡（PDF + PNG + HTML）。
 
