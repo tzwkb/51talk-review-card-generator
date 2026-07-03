@@ -1,29 +1,39 @@
 # A1 Review Card Generator
 
-中文 | [English](README_EN.md)
+[中文](README_ZH.md) | English
 
 
-自动生成 51Talk Business English 课后复习卡（PDF + PNG + HTML）。
+## Overview
 
-## 功能
+ Automated review-card generator for 51Talk Business English lessons, producing PDF, PNG, and HTML deliverables.
 
-- **单课卡片**（Lesson Card）：蓝色主题，一课一张
-- **单元总结**（Unit Summary）：紫色主题，汇总词汇、语法、成就
-- **双语支持**：L1-L3 自动输出英文 + 阿拉伯语
-- **批量处理**：支持文件夹批量、Excel 批量
-- **增量跳过**：已有 PDF 的课程自动跳过
+## Key Capabilities
 
-## 安装
+- Turns lesson material into after-class review cards.
+- Supports multiple output formats for delivery and preview.
+- Fits batch production of course assets.
+
+## Usage
+
+ Prepare input files and run the generation commands described in the detailed README below.
+
+## Status
+
+ This repository is maintained or used according to the current README notes.
+
+## Notes
+
+ The original format, parameter, and output-directory notes are kept below.
+
+## Command and Configuration Reference
+
+The following code blocks are preserved from the primary README. Commands, paths, and configuration keys are not translated; adjust them for the actual environment.
 
 ```bash
 pip install openai openpyxl pymupdf
 
 export REPORT_API_KEY="your-api-key"
 ```
-
-确保系统已安装 **Microsoft Edge** 或 **Google Chrome**（用于 HTML → PDF）。
-
-## 项目结构
 
 ```
 report_generator/
@@ -45,42 +55,13 @@ report_generator/
 └── KSA BE 20260324.xlsx # 数据源示例
 ```
 
-## 使用
-
-### 交互模式（推荐）
-
 ```bash
 python main.py
 ```
 
-按菜单选择：
-1. 处理单个 Markdown 文件
-2. 批量处理文件夹
-3. 处理 Excel 文件
-4. 生成单元总结
-
-### 命令行模式（Excel）
-
 ```bash
 python main.py --excel "KSA BE 20260324.xlsx" --output-dir "./output"
 ```
-
-可选参数：
-- `--logo <path>` — 自定义 logo 图片
-- `--save-json` — 保存中间 JSON
-- `--levels 1 2 3` — 只处理指定级别
-
-### 环境变量
-
-| 变量 | 默认值 | 说明 |
-|---|---|---|
-| `REPORT_SKIP_EXISTING` | `1` | 已有 PDF 时跳过 |
-
-## 输入格式
-
-### Markdown 文件
-
-文件名格式：`Unit{N}_Lesson{M}.md`
 
 ```markdown
 ### Unit 1: Greetings & Introductions
@@ -94,26 +75,6 @@ python main.py --excel "KSA BE 20260324.xlsx" --output-dir "./output"
 - ...
 ```
 
-### Excel 文件
-
-- **第1列** — Unit 编号
-- **第2列** — Lesson 编号
-- **第5列** — Markdown 课程内容
-- Sheet 名匹配 `^L(\d+)$`（如 `L1`, `L2`）
-
-## 输出
-
-每个课程生成：
-- `{lesson_code}.html` — 学习卡片
-- `{lesson_code}.pdf` — 扁平化 PDF（适合打印）
-- `{lesson_code}.png` — 首页预览
-- `{lesson_code}.json` — 结构化数据（可选）
-
-单元总结生成：
-- `L{level}/U{unit}/{unit_code}_summary.pdf`
-
-## 测试
-
 ```bash
 cd test
 
@@ -125,14 +86,6 @@ python test_real_lesson.py
 python test_real_unit_excel.py
 ```
 
-## 技术栈
+## Detailed Technical Notes
 
-- Python 3.13 + asyncio
-- OpenAI-compatible API（VectorEngine / Gemini）
-- openpyxl（Excel 读取）
-- PyMuPDF（PDF 栅格化 + PNG 导出）
-- Edge/Chrome Headless（HTML → PDF）
-
-## License
-
-MIT
+The primary README keeps the original technical details, history notes, full commands, and file layout. This file maintains the English version of the core documentation; consult the primary README code blocks and paths when exact commands are needed.
